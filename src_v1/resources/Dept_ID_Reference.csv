@@ -1,0 +1,38 @@
+TIN,GROUP_NPI,ID,ACCT_ID,LEGAL_BUSINESS_NAME,DBA_NAME,DIVISION
+205885439,1174662555,PATHREF,0,Regents of the University of California,UC Irvine Pathology Services,N/A
+208148732,1154479723,HOSP,3529487,The Regents of the University of California-Irvine,UC Irvine Hospitalist Program,N/A
+208148941,1366590762,FAMMED,3529467,Regents of the University of,UC Irvine Department of Family Medicine,N/A
+330065688,1356304034,OBGYN,3529489,Regents of the University of California,Ob-Gyn University Associates,N/A
+330299365,1558311811,PATH,3529492,Regents of the University of California,UCI Department of Pathology,N/A
+330301272,1518916527,DERM,3529466,UCI Department of Dermatology,The Regents of the University of California,N/A
+330306368,1669437075,ENT,3529496,University Head & Neck Surgeons,The Regents of the University of California,N/A
+330322171,1649458159,DOM (General),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,General DOM
+330322171,1003864174,DOM (All/Imm),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,Allergy/Immunology
+330322171,1003864182,DOM (Rheum),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,Rheumatology
+330322171,1205884392,DOM (IM),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,Internal Medicine
+330322171,1356399380,DOM (Heme/Onc),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,Hematology/Oncology
+330322171,1619925153,DOM (Endo),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,Endocrinology
+330322171,1639107139,DOM (Cardio),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,Cardiovascular Disease
+330322171,1629026729,DOM (Pulm),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,Pulmonary Disease
+330322171,1760430847,DOM (ID),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,Infectious Disease
+330322171,1902854078,DOM (Gastro),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,Gastroenterology
+330322171,1942258033,DOM (Neph),3529478,UC Regents UCI Dept of Medicine,UCI Department of Medicine,Nephrology
+330503714,1407806904,SURG,3529498,University Surgeons of Orange a Medical Group,University Surgeons of Orange,N/A
+330567798,1487602579,TRNEPH,4622859,Regents of the University of California,FKA: UCI Department of Ophthalmology >> Now: Transplant Nephrology,N/A
+330650006,1912102161,LASER,3529494,Regents of the University of California,Surgery Laser University Physicians,N/A
+330675245,1346298528,RAD,3529491,UC Regents,UCI Radiology Associates,N/A
+330706882,1235187311,PEDS,3529482,UC Regents UCI Dept of Pediatrics,The Regents of the University of California,N/A
+330841426,1255398533,URO,3529485,UCI Department of Urology,The Regents of the University of California,N/A
+330962730,1336171818,PLAS,3529464,Regents of the University of California,Plastic Surgery Division UCI,N/A
+931109844,1871541953,OPH,3529480,Regents of the University of California,UCI Ophthalmology Group,N/A
+953887518,1356399703,ORTHO,3529490,Regents of the University of California,Orthopaedic Faculty of Irvine,N/A
+953887522,1659329746,NSURG,3529488,Regents of the University of California,Neurosurgical Associates of Irvine,N/A
+954105559,1316165814,NEONATAL,0,Neo-Perinatalogy Associates of Orange County,Neonatal Perinatal Medicine,N/A
+954137974,1205884210,NEURO,3529497,Regents of the University of Claifornia Univ Neursciences,University Neurosciences,N/A
+954401759,1487602546,ANESTHESIA,3529495,Regents of the University of,University Anesthesia Associates,N/A
+954471355,1417907379,PMR,3529493,UCI Physical Medicine & Rehabilitation,UCI Physical Medicine & Rehabilitation (PM&R),N/A
+954482087,1831159003,PSYCH,3529484,The Department of Psychiatry,The Regents of the University of California,N/A
+954547089,1386692473,RADONC,3529499,UC Regents Department of Radiation Oncology,The Regents of the University of California,N/A
+330567576,1679521850,PRIMARYCARE,4472626,REGENTS OF THE UNIVERSITY OF CALIFORNIA,"	UCI PRIMARY CARE MEDICAL GROUP",N/A
+954615787,1154379394,EMERG,3529486,Regents of the University of,Emergency Medicine Faculty Group,N/A
+330678022,0000912455,<look up in OnBase>,<look up in OnBase>,<look up in OnBase>,<look up in OnBase>,N/A

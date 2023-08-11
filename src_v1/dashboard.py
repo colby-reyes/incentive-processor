@@ -35,7 +35,7 @@ st.sidebar.image(
 )
 st.sidebar.markdown("# Incentive Posting Preprocessor")
 st.sidebar.markdown(
-    "Use exported PB Remittance data to create templates for copy-paste posting of Prop56 and CalOptima Incentive payments"
+    "Use exported PB Remittance data to create templates for copy-paste posting of Prop56 and CalOptima Incentive payments"  # noqa: E501
 )
 st.sidebar.markdown(f"Version: `{vinfo.version}`")
 st.sidebar.divider()

@@ -1,13 +1,11 @@
 # utils.py
 
 import io
-import json
 import os
 from dataclasses import dataclass
 
 import msoffcrypto
 import pandas as pd
-import streamlit as st
 
 
 @dataclass
@@ -21,7 +19,7 @@ class VersionInfo:
 def amount_converter(amt_str: str):
     try:
         amt_float = float(amt_str.replace(",", ""))
-    except:
+    except AttributeError:
         amt_float = amt_str
     return amt_float
 
@@ -66,7 +64,7 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
             converters={"NPI": npi_to_str, "Amount": amount_converter},
         )
     except msoffcrypto.exceptions.InvalidKeyError as ke:
-        msg = f""":red[**Error decrypting file** {file_path}:] \n\n                {ke} \n\n PLEASE RE-ENTER PASSWORD"""
+        msg = f""":red[**Error decrypting file** {file_path}:] \n\n                {ke} \n\n PLEASE RE-ENTER PASSWORD"""  # noqa: E501
         df = None
     except Exception as e:
         msg = f"Error decrypting file: :red[{file_path}]\n >>> {e}"

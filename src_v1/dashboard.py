@@ -4,12 +4,18 @@
 import os
 import shutil
 import time
+import warnings
+from datetime import datetime
 
 import pandas as pd
 import streamlit as st
 
 # import local functions
 import utils
+
+warnings.simplefilter(
+    "ignore",
+)
 
 uci_logo_link = (
     "https://www.logolynx.com/images/logolynx/4f/4f42c461be2388aca949521bbb6a64f1.gif"
@@ -40,6 +46,11 @@ st.sidebar.markdown(
 st.sidebar.markdown(f"Version: `{vinfo.version}`")
 st.sidebar.divider()
 
+st.sidebar.markdown("##### Standard Dept ID's")
+ref_info_df = utils.load_reference_info()
+st.sidebar.dataframe(ref_info_df[["TIN", "GROUP_NPI", "ID"]], hide_index=True)
+
+st.divider()
 st.sidebar.write("Developed by Colby Reyes")
 st.sidebar.write("Contact at colbyr@hs.uci.edu")
 
@@ -80,6 +91,12 @@ if "report_file" not in st.session_state:
 if "load_msg" not in st.session_state:
     st.session_state.load_msg = ""
 # st.write(f"load msg: {st.session_state.load_msg}")
+
+if "export_button_clicked" not in st.session_state:
+    st.session_state.export_button_clicked = False
+
+if "final_output_df" not in st.session_state:
+    st.session_state.final_output_df = None
 
 
 def new_upload():
@@ -166,18 +183,16 @@ if st.session_state.file_uploaded:
             "Enter spreadsheet password: ", type="password"
         )
         c3.markdown("")
-        c3.button("Run", on_click=load_and_process)
+        c3.markdown("")
+        c3.button("Run", on_click=load_and_process, type="primary")
         # c3.button("Run",on_click=run_and_clear_container)
         user_input_cont.empty()
 
 
-def verify_rows(df: pd.DataFrame):
-    checkboxes = {}
-    cc1, cc2 = st.columns([1, 8])
-    for index, row in df.iterrows():
-        ky = f"checkbox_{index}"
-        checkboxes[ky] = cc1.checkbox("", key=ky)
-        cc2.dataframe(row.T)
+# @st.cache_data
+def export_to_csv(df: pd.DataFrame):
+    # IMORTANT: cache the conversion to prevent computation on every rerun
+    return df.to_csv(index=False).encode("utf-8")
 
 
 if st.session_state.run_button_clicked and st.session_state.remits_df is not None:
@@ -185,13 +200,52 @@ if st.session_state.run_button_clicked and st.session_state.remits_df is not Non
     # st.table(st.session_state.remits_df)
     if "Verified?" not in st.session_state.remits_df.columns:
         st.session_state.remits_df.insert(loc=0, column="Verified?", value=False)
+    num_rows = len(st.session_state.remits_df)
+    editor_height = 100 + (35 * (num_rows - 1))
     edited_df = st.data_editor(
         st.session_state.remits_df,
         use_container_width=True,
         num_rows="fixed",
-        height=1000,
+        height=editor_height,
     )
-    st.write(st.session_state.remits_df.dtypes)
+    # st.write(st.session_state.remits_df.dtypes)
 
-    s = edited_df["Amount"].sum()
-    st.write(f"Total Amount: {s}")
+    s = edited_df[edited_df["Verified?"] == True]["Amount"].sum().round(2)  # noqa: E712
+    df_for_export = edited_df[edited_df["Verified?"] == True]  # noqa: E712
+    # st.write(f"Total Amount: ${s}")
+    st.write("Total Incentive Amount: ${:,}".format(s))
+
+    def fill_and_export():
+        st.session_state.final_output_df: pd.DataFrame = utils.fill_posting_data(
+            df_for_export, inc_type
+        )
+        st.session_state.export_button_clicked = True
+        st.session_state.run_button_clicked = False
+        return st.session_state.final_output_df
+
+    st.button(
+        "Process and Export for Posting",
+        help="Once you are done verifying which checks are incentives, click this button to export the data to a spreadsheet that is ready for quick copy-paste posting",
+        on_click=fill_and_export,
+        type="primary",
+        use_container_width=True,
+    )
+dt_now = datetime.today().date().isoformat()
+if st.session_state.export_button_clicked:
+    st.divider()
+    dlc1, dlc2, dlc3 = st.columns([2, 9, 2])
+    dlc1.subheader("File is ready!")
+
+    fname = f"{inc_type}_PostingSheet_{dt_now}.csv"
+    csv = export_to_csv(st.session_state.final_output_df)
+
+    dlc3.download_button(
+        label="Download as CSV", data=csv, file_name=fname, mime="text/csv"
+    )
+
+    st.data_editor(
+        st.session_state.final_output_df,
+        use_container_width=True,
+        num_rows="fixed",
+        hide_index=True,
+    )

@@ -2,10 +2,13 @@
 
 import io
 import os
+import warnings
 from dataclasses import dataclass
 
 import msoffcrypto
 import pandas as pd
+
+warnings.simplefilter("always")
 
 
 @dataclass
@@ -74,18 +77,33 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
 
 
 def load_reference_info(
-    info_path: str = "./resources/Dept_ID_Reference.csv",
+    info_path: str = "/Users/colbyreyes/Library/CloudStorage/OneDrive-UCIHealth/Documents/GitHub/incentive-processor/src_v1/resources/Dept_ID_Reference.csv",  # "./resources/Dept_ID_Reference.csv",
 ) -> pd.DataFrame:
     info_path = os.path.abspath(info_path)
-    ref_info_df = pd.read_csv(info_path)
+    ref_info_df = pd.read_csv(
+        info_path,
+        dtype={"TIN": "category", "GROUP_NPI": "category", "ACCT_ID": "category"},
+    )
     return ref_info_df
 
 
 def prep_data_for_verification(df: pd.DataFrame):
+    # load reference info
+    ref_info = load_reference_info()
+
+    # insert Department column for editing pre-export
+    df.insert(0, column="Dept", value="")
+
+    for index, row in df.iterrows():
+        dept = ref_info[ref_info.GROUP_NPI == row["NPI"]]["ID"].tolist()[0]
+        df.loc[index, "Dept"] = dept
+
+    # return ordered df
     ver_df = df[
         [
             "Process Errors",
             "Check #",
+            "Dept",
             "Default Payer",
             "Amount",
             "Deposit Date",
@@ -93,25 +111,58 @@ def prep_data_for_verification(df: pd.DataFrame):
             "NPI",
         ]
     ]
+
     return ver_df
 
 
-def fill_posting_data(
-    decryptedVerified_df: pd.DataFrame, ref_info_df: pd.DataFrame, inc_type="Prop56"
-):
+def fill_posting_data(decryptedVerified_df: pd.DataFrame, inc_type="Prop56"):
     """Function to fill in copy-paste fields upon clicking export button
     after data has been verified"""
+    ref_info_df = load_reference_info()
     posting_df = decryptedVerified_df.copy()
+
+    posting_df.insert(0, column="Comment1", value="")
+    posting_df.insert(0, column="Comment2", value="")
+    posting_df.insert(0, column="Clearing Account", value="")
+    # posting_df.insert(0, column="Dept", value="") ## fill Department from `posting_df`
+    posting_df.insert(0, column="Posted?", value=False)
 
     for index, row in posting_df.iterrows():
         # drop `PB` and `SUPERPAYOR` terms from payor name to return actual payor name
         payor = (
-            row["Payer Name"].replace("PB", "").replace("SUPERPAYOR").strip().title()
+            row["Default Payer"]
+            .replace("PB", "")
+            .replace("SUPERPAYOR", "")
+            .strip()
+            .title()
         )
         # fill department identifier from `NPI` column value
-        dept = ref_info_df[
-            ref_info_df.GROUP_NPI == row["NPI"]
-        ]  # TODO: confirm that "NPI" is the column name for remittance export
+        # dept = ref_info_df[ref_info_df.GROUP_NPI == row["NPI"]]["ID"].tolist()[0]
+        ### change to filling Department from "Dept" column in `posting_df`
+        dept = row["Dept"]
+        posting_df.loc[index, "Dept"] = dept
+
+        # fill comments columns
         posting_df.loc[
             index, "Comment1"
-        ] = f"{payor} {inc_type} Incentive Payment for {dept}"
+        ] = f"{payor} {inc_type} Incentive Payment for {dept}"  # noqa: E501
+        posting_df.loc[
+            index, "Comment2"
+        ] = f"{payor} {inc_type} Incentive Payment for {dept}"  # noqa: E501
+
+        # fill account number columns
+        acct = ref_info_df[ref_info_df.ID == row["Dept"]]["ACCT_ID"].tolist()[0]
+        posting_df.loc[index, "Clearing Account"] = str(acct)
+
+    return posting_df[
+        [
+            "Process Errors",
+            "Check #",
+            "Comment1",
+            "Clearing Account",
+            "Amount",
+            "Dept",
+            "Comment2",
+            "Posted?",
+        ]
+    ]

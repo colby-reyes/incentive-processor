@@ -2,4 +2,3 @@ xlrd
 pandas
 numpy
 msoffcrypto-tool
-ms-offcrypto-tool

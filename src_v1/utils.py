@@ -48,7 +48,7 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
             engine="openpyxl",
             dtype={
                 "Tax ID": "category",
-                #     "Check #": "category",
+                "Check #": "str",
                 #     "Default Payer": "category",
             },
             converters={"NPI": npi_to_str, "Amount": amount_converter},
@@ -77,7 +77,7 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
 
 
 def load_reference_info(
-    info_path: str = "./resources/Dept_ID_Reference.csv",  # "./resources/Dept_ID_Reference.csv",
+    info_path: str = r'C:\Users\colbyr\OneDrive - UCI Health\Documents\GitHub\incentive-processor\resources\Dept_ID_Reference.csv' #"./resources/Dept_ID_Reference.csv", 
 ) -> pd.DataFrame:
     info_path = os.path.abspath(info_path)
     ref_info_df = pd.read_csv(
@@ -95,7 +95,8 @@ def prep_data_for_verification(df: pd.DataFrame):
     df.insert(0, column="Dept", value="")
 
     for index, row in df.iterrows():
-        dept = ref_info[ref_info.GROUP_NPI == row["NPI"]]["ID"].tolist()[0]
+        #dept = ref_info[ref_info.GROUP_NPI == row["NPI"]]["ID"].tolist()[0]
+        dept = ref_info.loc[ref_info.GROUP_NPI == row["NPI"],"ID"].item()
         df.loc[index, "Dept"] = dept
 
     # return ordered df

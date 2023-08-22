@@ -60,9 +60,7 @@ st.title("Incentive Posting Pre-Processor")
 
 
 # select incentive type
-inc_type = st.selectbox(
-    "Incentive Type:", ["Prop56", "Caloptima N419", "Caloptima N423"], index=0
-)
+inc_type = st.selectbox("Incentive Type:", ["Prop56", "N419", "N423"], index=0)
 # initialize session state variables
 if "run_button_clicked" not in st.session_state:
     st.session_state.run_button_clicked = False
@@ -130,6 +128,7 @@ def load_and_process():
 
     if df is not None:
         st.session_state.remits_df = utils.prep_data_for_verification(df)
+        # st.write(st.session_state.remits_df.dtypes)
 
     try:
         shutil.rmtree("./tempDir", ignore_errors=False)
@@ -213,7 +212,7 @@ if st.session_state.run_button_clicked and st.session_state.remits_df is not Non
     s = edited_df[edited_df["Verified?"] == True]["Amount"].sum().round(2)  # noqa: E712
     df_for_export = edited_df[edited_df["Verified?"] == True]  # noqa: E712
     # st.write(f"Total Amount: ${s}")
-    st.write("Total Incentive Amount: ${:,}".format(s))
+    st.markdown("Total Incentive Amount: :green[**${:,}**]".format(s))
 
     def fill_and_export():
         st.session_state.final_output_df: pd.DataFrame = utils.fill_posting_data(
@@ -237,7 +236,11 @@ if st.session_state.export_button_clicked:
     dlc1.subheader("File is ready!")
 
     fname = f"{inc_type}_PostingSheet_{dt_now}.csv"
-    csv = export_to_csv(st.session_state.final_output_df)
+    csv = export_to_csv(
+        st.session_state.final_output_df[
+            ["Check #", "Comment1", "Clearing Account", "Amount", "Comment2", "Posted?"]
+        ]
+    )
 
     dlc3.download_button(
         label="Download as CSV", data=csv, file_name=fname, mime="text/csv"

@@ -77,7 +77,7 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
 
 
 def load_reference_info(
-    info_path: str = r'C:\Users\colbyr\OneDrive - UCI Health\Documents\GitHub\incentive-processor\resources\Dept_ID_Reference.csv' #"./resources/Dept_ID_Reference.csv", 
+    info_path: str = "./resources/Dept_ID_Reference.csv", 
 ) -> pd.DataFrame:
     info_path = os.path.abspath(info_path)
     ref_info_df = pd.read_csv(

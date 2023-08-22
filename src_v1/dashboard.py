@@ -206,6 +206,19 @@ if st.session_state.run_button_clicked and st.session_state.remits_df is not Non
         use_container_width=True,
         num_rows="fixed",
         height=editor_height,
+        disabled=["Check #","Process Errors","Amount"],
+        column_config={
+            "Amount": st.column_config.NumberColumn(
+                "Amount (USD)",
+                help="Total check amount",
+                format="$%2f"
+            ),
+            "Verified": st.column_config.CheckboxColumn(
+                "Verified?",
+                help="Check box to indicate that check has been verified as an incentive payment",
+                default=False,
+            ),
+        },
     )
     # st.write(st.session_state.remits_df.dtypes)
 

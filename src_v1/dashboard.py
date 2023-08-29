@@ -229,8 +229,8 @@ if st.session_state.run_button_clicked and st.session_state.remits_df is not Non
     )
     # st.write(st.session_state.remits_df.dtypes)
 
-    s = edited_df[edited_df["Verified?"] == True]["Amount"].sum().round(2)  # noqa: E712
-    df_for_export = edited_df[edited_df["Verified?"] == True]  # noqa: E712
+    s = edited_df[edited_df["Yes"] == True]["Amount"].sum().round(2)  # noqa: E712
+    df_for_export = edited_df[edited_df["Yes"] == True]  # noqa: E712
     # st.write(f"Total Amount: ${s}")
     st.markdown("Total Incentive Amount: :green[**${:,}**]".format(s))
 

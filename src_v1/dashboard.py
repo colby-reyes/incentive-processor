@@ -197,8 +197,10 @@ def export_to_csv(df: pd.DataFrame):
 if st.session_state.run_button_clicked and st.session_state.remits_df is not None:
     st.subheader(":white_check_mark: Data to Verify")
     # st.table(st.session_state.remits_df)
-    if "Verified?" not in st.session_state.remits_df.columns:
-        st.session_state.remits_df.insert(loc=0, column="Verified?", value=False)
+    if "No" not in st.session_state.remits_df.columns:
+        st.session_state.remits_df.insert(loc=0, column="No", value=False)
+    if "Yes" not in st.session_state.remits_df.columns:
+        st.session_state.remits_df.insert(loc=0, column="Yes", value=False)
     num_rows = len(st.session_state.remits_df)
     editor_height = 100 + (35 * (num_rows - 1))
     edited_df = st.data_editor(
@@ -213,9 +215,14 @@ if st.session_state.run_button_clicked and st.session_state.remits_df is not Non
                 help="Total check amount",
                 format="$%2f"
             ),
-            "Verified": st.column_config.CheckboxColumn(
-                "Verified?",
+            "Yes": st.column_config.CheckboxColumn(
+                "Yes",
                 help="Check box to indicate that check has been verified as an incentive payment",
+                default=False,
+            ),
+            "No": st.column_config.CheckboxColumn(
+                "No",
+                help="Check box to indicate that check has is *NOT* an incentive payment",
                 default=False,
             ),
         },

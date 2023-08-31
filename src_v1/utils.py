@@ -96,7 +96,15 @@ def prep_data_for_verification(df: pd.DataFrame):
 
     for index, row in df.iterrows():
         #dept = ref_info[ref_info.GROUP_NPI == row["NPI"]]["ID"].tolist()[0]
-        dept = ref_info.loc[ref_info.GROUP_NPI == row["NPI"],"ID"].item()
+        try:
+            dept = ref_info.loc[ref_info.GROUP_NPI == row["NPI"],"ID"].item()
+        except ValueError:
+            try:
+                print("<<< TRYING FIND BY TAX ID >>>>")
+                dept = ref_info.loc[ref_info.TIN == str(row["Tax ID"]),"ID"].item()
+            except ValueError:
+                print(" +++++++++++  Could not find by TAX ID or NPI +++++++++++ ")
+                dept = "<look up in OnBase>"
         df.loc[index, "Dept"] = dept
 
     # return ordered df

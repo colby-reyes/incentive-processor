@@ -244,7 +244,7 @@ if st.session_state.run_button_clicked and st.session_state.remits_df is not Non
 
     st.button(
         "Process and Export for Posting",
-        help="Once you are done verifying which checks are incentives, click this button to export the data to a spreadsheet that is ready for quick copy-paste posting",
+        help="Once you are done verifying which checks are incentives, click this button to export the data to a spreadsheet that is ready for quick copy-paste posting",  # noqa: E501
         on_click=fill_and_export,
         type="primary",
         use_container_width=True,

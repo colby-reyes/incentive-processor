@@ -109,18 +109,18 @@ def prep_data_for_verification(df: pd.DataFrame):
     for index, row in df.iterrows():
         # dept = ref_info[ref_info.GROUP_NPI == row["NPI"]]["ID"].tolist()[0]
         try:
-            print(f"type of row[npi]: {type(row['NPI'])}")
-            print(f"type of refinfo.GROUP_NPI[1]: {type(ref_info.GROUP_NPI[1])}")
+            # print(f"type of row[npi]: {type(row['NPI'])}")
+            # print(f"type of refinfo.GROUP_NPI[1]: {type(ref_info.GROUP_NPI[1])}")
             dept = ref_info.loc[ref_info.GROUP_NPI == row["NPI"], "ID"].item()
         except ValueError:
             try:
-                print("<<< TRYING FIND BY TAX ID >>>>")
-                print(f"Type of row[tax_ID]: {type(row['Tax ID'])}")
-                print(f"Type refinfo row: {type(ref_info.TIN[1])}")
+                # print("<<< TRYING FIND BY TAX ID >>>>")
+                # print(f"Type of row[tax_ID]: {type(row['Tax ID'])}")
+                # print(f"Type refinfo row: {type(ref_info.TIN[1])}")
 
                 dept = ref_info.loc[ref_info.TIN == row["Tax ID"], "ID"].item()
             except ValueError:
-                print(" +++++++++++  Could not find by TAX ID or NPI +++++++++++ ")
+                # print(" +++++++++++  Could not find by TAX ID or NPI +++++++++++ ")
                 dept = "<look up in OnBase>"
         df.loc[index, "Dept"] = dept
 

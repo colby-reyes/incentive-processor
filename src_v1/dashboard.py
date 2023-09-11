@@ -179,6 +179,9 @@ else:
     df = None
     load_msg_ctr.error(st.session_state.load_msg)
 
+if "dataEditor_expanded" not in st.session_state:
+    st.session_state.dataEditor_expanded = True
+
 c1, c2, c3, c4 = st.columns([1, 2, 2, 1])
 
 
@@ -201,68 +204,70 @@ def export_to_csv(df: pd.DataFrame):
 
 
 if st.session_state.run_button_clicked and st.session_state.remits_df is not None:
-    st.subheader(":white_check_mark: Data to Verify")
-    # st.table(st.session_state.remits_df)
-    if "No" not in st.session_state.remits_df.columns:
-        st.session_state.remits_df.insert(loc=0, column="No", value=False)
-    if "Yes" not in st.session_state.remits_df.columns:
-        st.session_state.remits_df.insert(loc=0, column="Yes", value=False)
-    num_rows = len(st.session_state.remits_df)
-    editor_height = 100 + (35 * (num_rows - 1))
-    edited_df = st.data_editor(
-        st.session_state.remits_df,
-        use_container_width=True,
-        num_rows="fixed",
-        height=editor_height,
-        disabled=[
-            "Check #",
-            "Process Errors",
-            "Amount",
-            "Deposit Date",
-            "Default Payer",
-            "Tax ID",
-            "NPI",
-        ],
-        column_config={
-            "Amount": st.column_config.NumberColumn(
-                "Amount (USD)", help="Total check amount", format="$%2f"
-            ),
-            "Yes": st.column_config.CheckboxColumn(
-                "Yes",
-                help="Check box to indicate that check has been verified as an incentive payment",
-                default=False,
-            ),
-            "No": st.column_config.CheckboxColumn(
-                "No",
-                help="Check box to indicate that check has is *NOT* an incentive payment",
-                default=False,
-            ),
-            "Tax ID": st.column_config.NumberColumn("Tax ID", format="%s"),
-            "NPI": st.column_config.NumberColumn("NPI", format="%s"),
-        },
-    )
-    # st.write(st.session_state.remits_df.dtypes)
-
-    s = edited_df[edited_df["Yes"] == True]["Amount"].sum().round(2)  # noqa: E712
-    df_for_export = edited_df[edited_df["Yes"] == True]  # noqa: E712
-    # st.write(f"Total Amount: ${s}")
-    st.markdown("Total Incentive Amount: :green[**${:,}**]".format(s))
-
-    def fill_and_export():
-        st.session_state.final_output_df: pd.DataFrame = utils.fill_posting_data(
-            df_for_export, inc_type
+    with st.expander(":white_check_mark: Data to Verify", expanded=st.session_state.dataEditor_expanded):
+        st.subheader(":white_check_mark: Data to Verify")
+        # st.table(st.session_state.remits_df)
+        if "No" not in st.session_state.remits_df.columns:
+            st.session_state.remits_df.insert(loc=0, column="No", value=False)
+        if "Yes" not in st.session_state.remits_df.columns:
+            st.session_state.remits_df.insert(loc=0, column="Yes", value=False)
+        num_rows = len(st.session_state.remits_df)
+        editor_height = 100 + (35 * (num_rows - 1))
+        edited_df = st.data_editor(
+            st.session_state.remits_df,
+            use_container_width=True,
+            num_rows="fixed",
+            height=editor_height,
+            disabled=[
+                "Check #",
+                "Process Errors",
+                "Amount",
+                "Deposit Date",
+                "Default Payer",
+                "Tax ID",
+                "NPI",
+            ],
+            column_config={
+                "Amount": st.column_config.NumberColumn(
+                    "Amount (USD)", help="Total check amount", format="$%2f"
+                ),
+                "Yes": st.column_config.CheckboxColumn(
+                    "Yes",
+                    help="Check box to indicate that check has been verified as an incentive payment",
+                    default=False,
+                ),
+                "No": st.column_config.CheckboxColumn(
+                    "No",
+                    help="Check box to indicate that check has is *NOT* an incentive payment",
+                    default=False,
+                ),
+                "Tax ID": st.column_config.NumberColumn("Tax ID", format="%s"),
+                "NPI": st.column_config.NumberColumn("NPI", format="%s"),
+            },
         )
-        st.session_state.export_button_clicked = True
-        st.session_state.run_button_clicked = False
-        return st.session_state.final_output_df
+        # st.write(st.session_state.remits_df.dtypes)
 
-    st.button(
-        "Process and Export for Posting",
-        help="Once you are done verifying which checks are incentives, click this button to export the data to a spreadsheet that is ready for quick copy-paste posting",  # noqa: E501
-        on_click=fill_and_export,
-        type="primary",
-        use_container_width=True,
-    )
+        s = edited_df[edited_df["Yes"] == True]["Amount"].sum().round(2)  # noqa: E712
+        df_for_export = edited_df[edited_df["Yes"] == True]  # noqa: E712
+        # st.write(f"Total Amount: ${s}")
+        st.markdown("Total Incentive Amount: :green[**${:,}**]".format(s))
+
+        def fill_and_export():
+            st.session_state.final_output_df: pd.DataFrame = utils.fill_posting_data(
+                df_for_export, inc_type
+            )
+            st.session_state.export_button_clicked = True
+            st.session_state.run_button_clicked = False
+            st.session_state.dataEditor_expanded = False
+            return st.session_state.final_output_df
+
+        st.button(
+            "Process and Export for Posting",
+            help="Once you are done verifying which checks are incentives, click this button to export the data to a spreadsheet that is ready for quick copy-paste posting",  # noqa: E501
+            on_click=fill_and_export,
+            type="primary",
+            use_container_width=True,
+        )
 dt_now = datetime.today().date().isoformat()
 if st.session_state.export_button_clicked:
     st.divider()

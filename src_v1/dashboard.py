@@ -48,6 +48,12 @@ st.sidebar.divider()
 
 st.sidebar.markdown("##### Standard Dept ID's")
 ref_info_df = utils.load_reference_info()
+
+# transform number cols to str for easier reading
+ref_info_df["TIN"] = ref_info_df["TIN"].astype(str)
+ref_info_df["GROUP_NPI"] = ref_info_df["GROUP_NPI"].astype(str)
+
+# display ID ref df
 st.sidebar.dataframe(ref_info_df[["TIN", "GROUP_NPI", "ID"]], hide_index=True)
 
 st.divider()
@@ -208,12 +214,18 @@ if st.session_state.run_button_clicked and st.session_state.remits_df is not Non
         use_container_width=True,
         num_rows="fixed",
         height=editor_height,
-        disabled=["Check #","Process Errors","Amount"],
+        disabled=[
+            "Check #",
+            "Process Errors",
+            "Amount",
+            "Deposit Date",
+            "Default Payer",
+            "Tax ID",
+            "NPI",
+        ],
         column_config={
             "Amount": st.column_config.NumberColumn(
-                "Amount (USD)",
-                help="Total check amount",
-                format="$%2f"
+                "Amount (USD)", help="Total check amount", format="$%2f"
             ),
             "Yes": st.column_config.CheckboxColumn(
                 "Yes",
@@ -225,6 +237,8 @@ if st.session_state.run_button_clicked and st.session_state.remits_df is not Non
                 help="Check box to indicate that check has is *NOT* an incentive payment",
                 default=False,
             ),
+            "Tax ID": st.column_config.NumberColumn("Tax ID", format="%s"),
+            "NPI": st.column_config.NumberColumn("NPI", format="%s"),
         },
     )
     # st.write(st.session_state.remits_df.dtypes)

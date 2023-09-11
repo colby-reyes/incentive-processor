@@ -10,6 +10,8 @@ import pandas as pd
 
 warnings.simplefilter("always")
 
+pd.options.future.infer_string = True
+
 
 @dataclass
 class VersionInfo:
@@ -47,11 +49,13 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
             temp,
             engine="openpyxl",
             dtype={
-                "Tax ID": "category",
+                "Tax ID": "int64[pyarrow]",
                 "Check #": "str",
+                "NPI": "int64[pyarrow]"
                 #     "Default Payer": "category",
             },
-            converters={"NPI": npi_to_str, "Amount": amount_converter},
+            converters={"Amount": amount_converter}, #"NPI": npi_to_str,
+            dtype_backend="pyarrow",
         )
     except msoffcrypto.exceptions.FileFormatError as ffe:
         msg = f"""Error decrypting file: {file_path}\n  >>> {ffe}
@@ -60,11 +64,13 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
             file_path,
             engine="openpyxl",
             dtype={
-                "Tax ID": "category",
+                "Tax ID": "int64[pyarrow]",
+                "NPI": "int64[pyarrow]"
                 #     "Check #": "category",
                 #     "Default Payer": "category",
             },
             converters={"NPI": npi_to_str, "Amount": amount_converter},
+            dtype_backend="pyarrow",
         )
     except msoffcrypto.exceptions.InvalidKeyError as ke:
         msg = f""":red[**Error decrypting file** {file_path}:] \n\n                {ke} \n\n PLEASE RE-ENTER PASSWORD"""  # noqa: E501
@@ -77,12 +83,18 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
 
 
 def load_reference_info(
-    info_path: str = "./resources/Dept_ID_Reference.csv", 
+    info_path: str = "./resources/Dept_ID_Reference.csv",
 ) -> pd.DataFrame:
     info_path = os.path.abspath(info_path)
     ref_info_df = pd.read_csv(
         info_path,
-        dtype={"TIN": "category", "GROUP_NPI": "category", "ACCT_ID": "category"},
+        dtype={
+            "TIN": "int64[pyarrow]",
+            "GROUP_NPI": "int64[pyarrow]",
+            "ACCT_ID": "category",
+        },
+        dtype_backend="pyarrow",
+        engine="pyarrow",
     )
     return ref_info_df
 
@@ -95,13 +107,18 @@ def prep_data_for_verification(df: pd.DataFrame):
     df.insert(0, column="Dept", value="")
 
     for index, row in df.iterrows():
-        #dept = ref_info[ref_info.GROUP_NPI == row["NPI"]]["ID"].tolist()[0]
+        # dept = ref_info[ref_info.GROUP_NPI == row["NPI"]]["ID"].tolist()[0]
         try:
-            dept = ref_info.loc[ref_info.GROUP_NPI == row["NPI"],"ID"].item()
+            print(f"type of row[npi]: {type(row['NPI'])}")
+            print(f"type of refinfo.GROUP_NPI[1]: {type(ref_info.GROUP_NPI[1])}")
+            dept = ref_info.loc[ref_info.GROUP_NPI == row["NPI"], "ID"].item()
         except ValueError:
             try:
                 print("<<< TRYING FIND BY TAX ID >>>>")
-                dept = ref_info.loc[ref_info.TIN == str(row["Tax ID"]),"ID"].item()
+                print(f"Type of row[tax_ID]: {type(row['Tax ID'])}")
+                print(f"Type refinfo row: {type(ref_info.TIN[1])}")
+
+                dept = ref_info.loc[ref_info.TIN == row["Tax ID"], "ID"].item()
             except ValueError:
                 print(" +++++++++++  Could not find by TAX ID or NPI +++++++++++ ")
                 dept = "<look up in OnBase>"

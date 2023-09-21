@@ -131,7 +131,7 @@ def load_and_process():
         st.session_state.load_msg, df = utils.load_remitList_spreadsheet(
             report_file_path, st.session_state.pwd
         )
-
+    
     if df is not None:
         st.session_state.remits_df = utils.prep_data_for_verification(df)
         # st.write(st.session_state.remits_df.dtypes)
@@ -170,6 +170,13 @@ elif "Unencrypted file" in st.session_state.load_msg:
     load_msg_ctr.success(st.session_state.load_msg)
     time.sleep(3)
     load_msg_ctr.empty()
+
+elif "could not infer" in st.session_state.load_msg:
+    user_input_cont.empty()
+    st.session_state.run_button_clicked = True
+    st.session_state.file_uploaded = False
+    load_msg_ctr.success(st.session_state.load_msg)
+    
 
 else:
     st.session_state.run_button_clicked = False
@@ -223,7 +230,6 @@ if st.session_state.run_button_clicked and st.session_state.remits_df is not Non
                 "Process Errors",
                 "Amount",
                 "Deposit Date",
-                "Default Payer",
                 "Tax ID",
                 "NPI",
             ],

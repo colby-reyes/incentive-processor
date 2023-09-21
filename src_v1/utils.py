@@ -7,6 +7,8 @@ from dataclasses import dataclass
 
 import msoffcrypto
 import pandas as pd
+import pyarrow as pa
+
 
 warnings.simplefilter("always")
 
@@ -33,6 +35,10 @@ def npi_to_str(npi: int):
     npi_str = str(npi)
     return npi_str
 
+def checkNum_to_str(checkNum):
+    checkNum_str = str(checkNum)
+    return checkNum_str
+
 
 def load_remitList_spreadsheet(file_path: str, pwd: str):
     # load file to temporary `bytesIO` object and unlock with `msoffcrypto` tool
@@ -50,7 +56,7 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
             engine="openpyxl",
             dtype={
                 "Tax ID": "int64[pyarrow]",
-                "Check #": "str",
+                "Check #": "string[pyarrow]",
                 "NPI": "int64[pyarrow]"
                 #     "Default Payer": "category",
             },
@@ -75,6 +81,26 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
     except msoffcrypto.exceptions.InvalidKeyError as ke:
         msg = f""":red[**Error decrypting file** {file_path}:] \n\n                {ke} \n\n PLEASE RE-ENTER PASSWORD"""  # noqa: E501
         df = None
+    except pa.ArrowInvalid as ae:
+        msg = f"""`PyArrow` could not infer `dtype`: {ae}"""
+        with open(file_path, "rb") as f:
+            excel = msoffcrypto.OfficeFile(f)
+            excel.load_key(pwd)
+            excel.decrypt(temp)
+        
+        df = pd.read_excel(
+            temp,
+            engine="openpyxl",
+            dtype={
+                "Tax ID": "int64[pyarrow]",
+                "NPI": "int64[pyarrow]",
+                # "Check #": "int64[pyarrow]",
+                # "Default Payer": "category",
+            },
+            converters={"Check #":checkNum_to_str,"NPI": npi_to_str, "Amount": amount_converter},
+            dtype_backend="pyarrow"
+        )
+
     except Exception as e:
         msg = f"Error decrypting file: :red[{file_path}]\n >>> {e}"
         df = None

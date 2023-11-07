@@ -189,7 +189,7 @@ else:
 if "dataEditor_expanded" not in st.session_state:
     st.session_state.dataEditor_expanded = True
 
-c1, c2, c3, c4 = st.columns([1, 2, 2, 1])
+c1, c2, c3 = st.columns([1, 3, 1])
 
 
 if st.session_state.file_uploaded:
@@ -197,9 +197,7 @@ if st.session_state.file_uploaded:
         st.session_state.pwd = c2.text_input(
             "Enter spreadsheet password: ", type="password"
         )
-        c3.markdown("")
-        c3.markdown("")
-        c3.button("Run", on_click=load_and_process, type="primary")
+        c2.button("Run", on_click=load_and_process, type="primary",use_container_width=True)
         # c3.button("Run",on_click=run_and_clear_container)
         user_input_cont.empty()
 

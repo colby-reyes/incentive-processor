@@ -112,7 +112,7 @@ def new_upload():
 
 st.session_state.report_file = st.file_uploader(
     "Upload report file here",
-    type=["xlsx"],
+    type=["xlsx","xls"],
     accept_multiple_files=False,
     on_change=new_upload,
 )

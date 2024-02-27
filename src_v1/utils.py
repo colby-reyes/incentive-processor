@@ -12,7 +12,7 @@ import pyarrow as pa
 
 warnings.simplefilter("always")
 
-pd.options.future.infer_string = True
+pd.options.future.infer_string = False
 
 
 @dataclass
@@ -59,13 +59,13 @@ def load_remitList_spreadsheet(file_path: str, pwd: str):
             temp,
             engine="openpyxl",
             dtype={
-                "Tax ID": "int64[pyarrow]",
-                "Check #": "string[pyarrow]",
-                "NPI": "int64[pyarrow]"
+                # "Tax ID": "int64[pyarrow]",
+                "Check #": "category",
+                # "NPI": "int64[pyarrow]"
                 #     "Default Payer": "category",
             },
-            converters={"Amount": amount_converter}, #"NPI": npi_to_str,
-            dtype_backend="pyarrow",
+            converters={"Check #":checkNum_to_str,"Amount": amount_converter}, #"NPI": npi_to_str,
+            dtype_backend="numpy_nullable",
         )
     except msoffcrypto.exceptions.FileFormatError as ffe:
         msg = f"""Error decrypting file: {file_path}\n  >>> {ffe}

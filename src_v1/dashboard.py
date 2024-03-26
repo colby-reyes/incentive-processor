@@ -226,7 +226,7 @@ if st.session_state.run_button_clicked and st.session_state.remits_df is not Non
             disabled=[
                 "Check #",
                 "Process Errors",
-                "Amount",
+                # "Amount",
                 "Deposit Date",
                 "Tax ID",
                 "NPI",

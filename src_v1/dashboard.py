@@ -133,8 +133,26 @@ def load_and_process():
         )
     
     if df is not None:
-        st.session_state.remits_df = utils.prep_data_for_verification(df)
-        # st.write(st.session_state.remits_df.dtypes)
+        try:
+            st.session_state.remits_df = utils.prep_data_for_verification(df)
+        except utils.MissingTaxIDError:
+            error_str = "`Tax ID` column is missing from `PB Remit` export. \n\n " + \
+                "Please ensure that the Tax ID column is present in `PB Remit`." + \
+                " To do so, open `PB Remit`, right click on the columns, and click `Modify Columns`. Then, " + \
+                "check the box next to `Tax ID`."
+            st.error(error_str)
+        except utils.MissingNPIError:
+            error_str = "`NPI` column is missing from `PB Remit` export. \n\n " + \
+                "Please ensure that the Tax ID column is present in `PB Remit`." + \
+                " To do so, open `PB Remit`, right click on the columns, and click `Modify Columns`. Then, " + \
+                "check the box next to `NPI`."
+            st.error(error_str)
+        except KeyError as other_key_error:
+            error_str = f"{other_key_error} \n\n"+ \
+                "Please ensure that the this column is present in `PB Remit`." + \
+                " To do so, open `PB Remit`, right click on the columns, and click `Modify Columns`. Then, " + \
+                "check the box next the name of this column."
+            st.error(error_str)
 
     try:
         shutil.rmtree("./tempDir", ignore_errors=False)

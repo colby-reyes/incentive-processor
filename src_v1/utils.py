@@ -129,6 +129,17 @@ def load_reference_info(
     return ref_info_df
 
 
+class MissingNPIError(KeyError):
+    def __init__(self, message=" `NPI` column is missing from `PB Remit` export") -> None:
+        self.message = message
+        super().__init__(message)
+
+class MissingTaxIDError(KeyError):
+    def __init__(self, message="`Tax ID` column is missing from `PB Remit` export") -> None:
+        self.message = message
+        super().__init__(message)
+
+
 def prep_data_for_verification(df: pd.DataFrame):
     # load reference info
     ref_info = load_reference_info()
@@ -144,6 +155,8 @@ def prep_data_for_verification(df: pd.DataFrame):
             print(f"type of row[npi]: {type(row['NPI'])}")
             print(f"type of refinfo.GROUP_NPI[1]: {type(ref_info.GROUP_NPI[1])}")
             dept = ref_info.loc[ref_info.GROUP_NPI == row["NPI"], "ID"].item()
+        except KeyError:
+            raise MissingNPIError
         except ValueError:
             try:
                 print("<<< TRYING FIND BY TAX ID >>>>")
@@ -152,6 +165,8 @@ def prep_data_for_verification(df: pd.DataFrame):
                 print(f"Type refinfo row: {type(ref_info.TIN[1])}")
 
                 dept = ref_info.loc[ref_info.TIN == row["Tax ID"], "ID"].item()
+            except KeyError:
+                raise MissingTaxIDError
             except ValueError:
                 print(" +++++++++++  Could not find by TAX ID or NPI +++++++++++ ")
                 dept = "<look up in OnBase>"

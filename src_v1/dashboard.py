@@ -37,7 +37,7 @@ st.set_page_config(
 # Sidebar Configuration
 st.sidebar.image(
     uci_logo_link,
-    use_column_width=True,
+    use_container_width=True,
 )
 st.sidebar.markdown("# Incentive Posting Preprocessor")
 st.sidebar.markdown(
